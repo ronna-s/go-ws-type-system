@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"io"
 	"net"
-	"sync"
 	"testing"
 )
 
@@ -27,26 +26,25 @@ func TestHandle(t *testing.T) {
 func TestServe(t *testing.T) {
 	const addr = ":0000"
 	const str = "test\n"
-	var line string
+
 	l, err := net.Listen("tcp", addr)
 	defer l.Close()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	var wg sync.WaitGroup
-
-	wg.Add(1)
 	serveDone := make(chan struct{})
+	lineCh := make(chan string)
 
 	go func() {
 		t.Log(Serve(l, func(rw io.ReadWriter) {
-			line, err = bufio.NewReader(rw).ReadString('\n')
+			reader := bufio.NewReader(rw)
+			line, err := reader.ReadString('\n')
 			if err != nil {
 				t.Errorf("failed to read from the connection %s", err.Error())
 			}
-			// allow the test to finish
-			wg.Done()
+			lineCh <- line
+			close(lineCh)
 		}))
 		close(serveDone)
 	}()
@@ -62,7 +60,7 @@ func TestServe(t *testing.T) {
 	if _, err = conn.Write([]byte(str)); err != nil {
 		t.Errorf("failed to write to the connection %s", err.Error())
 	}
-	wg.Wait()
+	line := <-lineCh
 	if line != str {
 		t.Errorf("expected %s, got %s", str, line)
 	}
