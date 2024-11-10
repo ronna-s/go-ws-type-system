@@ -13,7 +13,7 @@ const (
 	Legacy
 )
 
-// React returns XP gained, Satisfaction gained and the new Production state
+// React returns XP gained, Satisfaction gained and the new PRODUCTION state
 func (s ProductionState) React(well bool) ProductionState {
 	next := s.nextState(well)
 	return next
@@ -65,16 +65,16 @@ func NewProduction() ProductionState {
 // Upset upsets production
 func (p *ProductionState) Upset() string {
 	*p = p.React(false)
-	return fmt.Sprintf("PRODUCTION doesn't like you. Production is now '%s'", *p)
+	return fmt.Sprintf("PRODUCTION doesn't like you. PRODUCTION is now '%s'", *p)
 }
 
 // CalmDown calms production down
 func (p *ProductionState) CalmDown() string {
 	*p = p.React(true)
-	return fmt.Sprintf("PRODUCTION is happy with your move. Production is now '%s'", *p)
+	return fmt.Sprintf("PRODUCTION is happy with your move. PRODUCTION is now '%s'", *p)
 }
 
 // NoImpact calms production down
 func (p *ProductionState) NoImpact() string {
-	return fmt.Sprintf("PRODUCTION is indifferent to your move. Production is now '%s'", *p)
+	return fmt.Sprintf("PRODUCTION is indifferent to your ways. PRODUCTION is now '%s'", *p)
 }

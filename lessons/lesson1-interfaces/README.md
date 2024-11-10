@@ -15,11 +15,11 @@ Game starts:
 
 
 Game flow:
-- Production state can go from "calm", "annoyed", "enraged", up to "legacy".
+- PRODUCTION state can go from "calm", "annoyed", "enraged", up to "legacy".
 - The game ends if there are no more players (except for Minion, minions don't count since you can't fire minions).
 - The game is won if production is calm and the band played more than 10 rounds.
 - In each iteration a player has to select a move to make against production.
-- Production will react to the option played.
+- PRODUCTION will react to the option played.
 - If an unsuccessful move was made against PRODUCTION while in legacy mode, one player will be terminated at random (except for Minion, minions can't be fired).
 
 ### Your mission:
@@ -32,6 +32,9 @@ Game flow:
   - Rubyist has one option - dark magic, which always upsets PRODUCTION unless production is in legacy mood, then it's surprisingly effective.
 - Implement the game loop.
 - Plug in the players to your game.
+- Implement the Gopher player:
+  - Gopher can create a feature.
+  - Features always make PRODUCTION happy.
 
 ### You're free now to define your own game: 
 - Add as many more players as you'd like (for instance, a manager who can buy Pizza for everyone).

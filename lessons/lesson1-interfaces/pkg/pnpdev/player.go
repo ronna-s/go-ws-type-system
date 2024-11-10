@@ -1,6 +1,8 @@
 package pnpdev
 
-import "github.com/ronna-s/go-design-workshop/lessons/lesson1-interfaces/pnp"
+import (
+	pnp2 "github.com/ronna-s/go-design-workshop/lessons/lesson1-interfaces/pkg/pnp"
+)
 
 // Minion represents a minion P&P player
 // The zero value is a dead minion player.
@@ -19,8 +21,8 @@ func (o Option) Selected() string {
 	return o.Fn()
 }
 
-func (m Minion) Options(g *pnp.Game) []pnp.Option {
-	opts := []pnp.Option{
+func (m Minion) Options(g *pnp2.Game) []pnp2.Option {
+	opts := []pnp2.Option{
 		Option{
 			Description: "Create a bug",
 			Fn: func() string {
@@ -57,12 +59,12 @@ type Rubyist struct {
 	Dead bool
 }
 
-func (r *Rubyist) Options(g *pnp.Game) []pnp.Option {
-	return []pnp.Option{
+func (r *Rubyist) Options(g *pnp2.Game) []pnp2.Option {
+	return []pnp2.Option{
 		Option{
 			Description: "Dark magic",
 			Fn: func() string {
-				if g.Prod == pnp.Legacy {
+				if g.Prod == pnp2.Legacy {
 					return g.Prod.CalmDown()
 				}
 				return g.Prod.Upset()
