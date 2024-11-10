@@ -9,10 +9,9 @@ import (
 	"time"
 
 	"github.com/gdamore/tcell/v2"
-
 	"github.com/rivo/tview"
 
-	pnp2 "github.com/ronna-s/go-design-workshop/lessons/lesson1-interfaces/pnp"
+	"github.com/ronna-s/go-design-workshop/lessons/lesson1-interfaces/pnp"
 	"github.com/ronna-s/go-design-workshop/lessons/lesson1-interfaces/pnp/engine"
 )
 
@@ -22,7 +21,7 @@ type Engine struct {
 	Menu      *tview.List
 	Inventory *tview.TextView
 	Prod      *tview.TextView
-	ProdState pnp2.ProductionState
+	ProdState pnp.ProductionState
 }
 
 func New() *Engine {
@@ -57,7 +56,7 @@ func (e *Engine) Stop() {
 	e.App.Stop()
 }
 
-func (e *Engine) RenderGame(g *pnp2.Game) {
+func (e *Engine) RenderGame(g *pnp.Game) {
 	players := g.Players
 	currentPlayer := g.CurrentPlayer
 	e.ProdState = g.Prod
@@ -75,7 +74,7 @@ func (e *Engine) RenderGame(g *pnp2.Game) {
 	e.Pages.AddAndSwitchToPage(pageName, view, true)
 }
 
-func (e Engine) SelectOption(g *pnp2.Game, player pnp2.Player, fn func()) {
+func (e *Engine) SelectOption(g *pnp.Game, player pnp.Player, fn func()) {
 	e.Menu.Clear()
 	for i, o := range player.Options(g) {
 		e.Menu.AddItem(o.String(), "", rune(49+i), nil)
@@ -94,7 +93,7 @@ type Livable interface {
 	Alive() bool
 }
 
-func alive(p pnp2.Player) bool {
+func alive(p pnp.Player) bool {
 	if livable, ok := p.(Livable); ok {
 		return livable.Alive()
 	}
@@ -114,7 +113,7 @@ func (e *Engine) RenderActivity(description string, fn func()) {
 	e.Pages.AddPage("modal", m, true, true)
 }
 
-func (e *Engine) RenderPlayers(players []pnp2.Player, current int) *tview.Flex {
+func (e *Engine) RenderPlayers(players []pnp.Player, current int) *tview.Flex {
 	playersView := tview.NewFlex().SetDirection(tview.FlexRow)
 	for i, p := range players {
 		var color tcell.Color
@@ -144,13 +143,13 @@ var Rand = rand.Intn
 func (e *Engine) RenderProd() {
 	var color tcell.Color
 	switch e.ProdState {
-	case pnp2.Calm:
+	case pnp.Calm:
 		color = tcell.ColorGreen
-	case pnp2.Annoyed:
+	case pnp.Annoyed:
 		color = tcell.ColorYellow
-	case pnp2.Enraged:
+	case pnp.Enraged:
 		color = tcell.ColorRed
-	case pnp2.Legacy:
+	case pnp.Legacy:
 		color = tcell.ColorPurple
 	}
 
@@ -178,10 +177,9 @@ func (e *Engine) GameWon() {
 	m.innerFlex.ResizeItem(m.modalFlex, 0, 5)
 
 	e.Pages.AddPage("game won", m, true, true)
-	//e.Pages.AddAndSwitchToPage("", tview.NewTextView().SetText(engine.GameWon).SetTextColor(tcell.ColorLime), true)
 }
 
-func (e Engine) GameOver() {
+func (e *Engine) GameOver() {
 	m := NewModal().AddButtons("Oh well...").
 		SetButtonsAlign(tview.AlignCenter).
 		SetText(engine.GameOver).
@@ -197,7 +195,7 @@ func (e Engine) GameOver() {
 
 }
 
-func (e Engine) PizzaDelivery(fn func()) {
+func (e *Engine) PizzaDelivery(fn func()) {
 	const pageName = "pizza"
 	m := NewModal().
 		SetText(engine.Pizza).
