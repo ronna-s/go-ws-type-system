@@ -91,3 +91,35 @@ Of course, you might not be likely to use linked lists in your day to day, but y
 
 The common thread to these examples is that before generics we had to trade generalizing certain behavior for type safety (or generate code to do so), now we can have both.
 
+So, how does it work, exactly?
+
+To use generic types in Go, we have to tell the compiler something about the type that we expect, using a constraint.
+Constraints are defined using interfaces.
+1. If our code supports any type - we can use the `any` keyword (stand-in for the empty interface `interface{}`).
+2. If our codes expects a type with a subset of behaviors, we use an interface with the methods that we need (very similarly to using regular interfaces).
+3. If our code expects a type with an underlying type of a certain type, we use the `~` operator. e.g. `interface{~int}`.
+4. If our code expects an exact type - we use the type name. e.g. `inteface{string}`.
+5. We can also union types using the `|` operator. e.g. `interface{int|string}`. This constraint will allow using + on strings and ints alike.
+
+Sometimes we need to get more creative with generics and express dependencies between types. For instance, when the pointer to a type implements a constraint (the interface), but we also need the type itself.
+For instance, we can expect a type T and another type `interface{~[]T}` which is any type with an underlying type of a slice of T.
+We can expect a type which is a function that returns T like so: `interface{~func() T}`.'
+
+Consider the following example where we need to populate a variable of type T, but the interface is implemented by its pointer. 
+PT is defined to be a pointer to T (a dependency on the previous generic type) and we provide also the interface methods that it implements (by embedding proto.Message).:
+```go
+import (
+	"google.golang.org/protobuf/proto"
+)
+
+func DoSomething[T any, PT interface {
+	proto.Message
+	*T
+}]() {
+
+	var t T
+	var protoMessage PT = &t
+	// do something to populate t
+}
+```
+
