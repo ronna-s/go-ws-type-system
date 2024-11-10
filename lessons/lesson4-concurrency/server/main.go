@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"io"
 	"log"
 	"net"
 	"sync"
@@ -22,15 +23,19 @@ func main() {
 	log.Print(Serve(l, Handle))
 }
 
-type Handler func(net.Conn)
+type Handler func(writer io.ReadWriter)
 
-func Handle(c net.Conn) {
+func Handle(c io.ReadWriter) {
 	s := bufio.NewScanner(c)
+	// reads a single line from the connection and writes it back
 	for s.Scan() {
-		c.Write(s.Bytes())
-		c.Write([]byte("\n"))
+		b := s.Bytes()
+		log.Println("received:", string(b))
+		_, err := c.Write(append(b, []byte("\n")...))
+		if err != nil {
+			log.Fatal("failed to write to the connection")
+		}
 	}
-	log.Println("client closed the connection")
 }
 
 func Serve(l net.Listener, h Handler) error {
