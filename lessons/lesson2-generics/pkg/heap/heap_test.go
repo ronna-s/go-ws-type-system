@@ -2,19 +2,7 @@ package heap
 
 import (
 	"testing"
-
-	"golang.org/x/exp/constraints"
 )
-
-type OrderedItem[T constraints.Ordered] struct {
-	Val T
-}
-
-type intHeap = Heap[OrderedItem[int]]
-
-func (i OrderedItem[T]) Less(j OrderedItem[T]) bool {
-	return i.Val < j.Val
-}
 
 func verify(t *testing.T, h intHeap, i int) {
 	t.Helper()
