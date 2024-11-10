@@ -7,6 +7,6 @@ import (
 )
 
 func main() {
-	game := pnp.New(pnpdev.NewMinion(), pnpdev.NewRubyist())
+	game := pnp.New(pnpdev.NewRubyist())
 	game.Run(engine.New())
 }

@@ -1,8 +1,6 @@
 package pnpdev
 
-import (
-	pnp2 "github.com/ronna-s/go-design-workshop/lessons/lesson1-interfaces/pnp"
-)
+import "github.com/ronna-s/go-design-workshop/lessons/lesson1-interfaces/pnp"
 
 // Minion represents a minion P&P player
 // The zero value is a dead minion player.
@@ -21,8 +19,8 @@ func (o Option) Selected() string {
 	return o.Fn()
 }
 
-func (m Minion) Options(g *pnp2.Game) []pnp2.Option {
-	opts := []pnp2.Option{
+func (m Minion) Options(g *pnp.Game) []pnp.Option {
+	opts := []pnp.Option{
 		Option{
 			Description: "Create a bug",
 			Fn: func() string {
@@ -55,31 +53,35 @@ func (m Minion) String() string {
 	return "Minion"
 }
 
-type Rubyist func(g *pnp2.Game) []pnp2.Option
-
-func (r Rubyist) Options(g *pnp2.Game) []pnp2.Option {
-	return r(g)
+type Rubyist struct {
+	Dead bool
 }
-func NewRubyist() Rubyist {
-	return func(g *pnp2.Game) []pnp2.Option {
-		return []pnp2.Option{
-			Option{
-				Description: "Dark magic",
-				Fn: func() string {
-					if g.Prod == pnp2.Legacy {
-						return g.Prod.CalmDown()
-					}
-					return g.Prod.Upset()
-				},
+
+func (r *Rubyist) Options(g *pnp.Game) []pnp.Option {
+	return []pnp.Option{
+		Option{
+			Description: "Dark magic",
+			Fn: func() string {
+				if g.Prod == pnp.Legacy {
+					return g.Prod.CalmDown()
+				}
+				return g.Prod.Upset()
 			},
-		}
+		},
 	}
 }
+func (r *Rubyist) Alive() bool {
+	return !r.Dead
+}
 
-func (r Rubyist) AsciiArt() string {
+func NewRubyist() *Rubyist {
+	return &Rubyist{}
+}
+
+func (r *Rubyist) AsciiArt() string {
 	return rubyistArt
 }
 
-func (r Rubyist) String() string {
+func (r *Rubyist) String() string {
 	return "Rubyist"
 }
