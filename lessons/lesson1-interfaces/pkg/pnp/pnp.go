@@ -64,14 +64,5 @@ func (g *Game) Welcome(e Engine, fn func()) {
 
 // MainLoop kicks off the next players round
 func (g *Game) MainLoop(e Engine) {
-	if g.Coins == 0 {
-		e.GameOver()
-		return
-	}
-	p := g.Players[g.CurrentPlayer]
-	e.RenderGame(g)
-	e.SelectOption(g, p, func() {
-		g.CurrentPlayer = (g.CurrentPlayer + 1) % len(g.Players)
-		g.MainLoop(e)
-	})
+	
 }
