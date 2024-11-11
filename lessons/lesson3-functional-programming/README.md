@@ -14,15 +14,15 @@ Go doesn't support it for various reasons.
 Functional programming is the practice of building software by composing pure functions, avoiding shared state, mutable data, and side-effects. It is declarative rather than imperative, and application state flows through pure functions, e,g.:
 
 ```go
-    fn1(fn2(fn3(someArgs)))
+fn1(fn2(fn3(someArgs)))
 ```
 Instead of:
     
 ```go
-    res := Proc1(someArgs)
-    Proc2(otherArgs, res)
-	sideEffects := ReadSideEffects()
-	Proc3(sideEffects)
+res := Proc1(someArgs)
+Proc2(otherArgs, res)
+sideEffects := ReadSideEffects()
+Proc3(sideEffects)
 ```
 
 ## Why use functional programming?
