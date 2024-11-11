@@ -3,7 +3,7 @@
 ## Task: build P&P game
 P&P™ stands for Platforms and Programmers. 
 
-P&P is a game in which a band of developers tries to take own the ultimate villain: PRODUCTION.
+P&P is a game in which a band of developers tries to take on the ultimate villain: PRODUCTION.
 
 Today you are going to parts of the game engine, the characters (developers), and how they interact with PRODUCTION.
 
@@ -23,7 +23,7 @@ Game flow:
 - If an unsuccessful move was made against PRODUCTION while in legacy mode, one player will be terminated at random (except for Minion, minions can't be fired).
 
 ### Your mission:
-- Implement Minion (in `pnpdev/player.go`:
+- Implement Minion (in `pnpdev/player.go`):
   - Minion can create bugs.
   - If there's a budget you can choose to buy a Banana instead (costs 1 gold coin) to distract Minion from creating a bug by buying a banana and have him eat it.
   - Bugs always upset PRODUCTION.
