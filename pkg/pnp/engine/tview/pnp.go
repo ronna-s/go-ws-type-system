@@ -1,5 +1,5 @@
-// Package engine provides a simple P&P engine
-package engine
+// Package tview provides a simple P&P engine based on tview
+package tview
 
 import (
 	"fmt"
@@ -15,6 +15,8 @@ import (
 	"github.com/ronna-s/go-ws-type-system/pkg/pnp"
 	"github.com/ronna-s/go-ws-type-system/pkg/pnp/engine"
 )
+
+var _ pnp.Engine = &Engine{}
 
 type Engine struct {
 	App       *tview.Application
@@ -65,7 +67,7 @@ func (e *Engine) RenderGame(g *pnp.Game) {
 	const pageName = "main"
 	e.Pages.RemovePage(pageName)
 	view := tview.NewFlex().SetDirection(tview.FlexColumn).
-		AddItem(e.RenderPlayers(players, currentPlayer), 0, 2, false).
+		AddItem(e.RenderPlayers(g.BandName, players, currentPlayer), 0, 2, false).
 		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
 			AddItem(e.Menu, 0, 1, true).
 			AddItem(e.Inventory, 0, 1, false).
@@ -76,7 +78,7 @@ func (e *Engine) RenderGame(g *pnp.Game) {
 	e.Pages.AddAndSwitchToPage(pageName, view, true)
 }
 
-func (e *Engine) SelectOption(g *pnp.Game, player pnp.Player, fn func()) {
+func (e *Engine) SelectOption(g *pnp.Game, player pnp.Player, cb func(selected pnp.Option)) {
 	e.Menu.Clear()
 	for i, o := range player.Options(g) {
 		e.Menu.AddItem(o.String(), "", rune(49+i), nil)
@@ -85,10 +87,23 @@ func (e *Engine) SelectOption(g *pnp.Game, player pnp.Player, fn func()) {
 	e.Menu.SetBorder(true).SetTitle("Select move...")
 	e.Menu.SetSelectedFunc(func(choice int, s string, s2 string, r rune) {
 		option := player.Options(g)[choice]
-		e.RenderActivity(option.Selected(), func() {
-			fn()
-		})
+		cb(option)
 	})
+}
+
+func (e *Engine) RenderOutcome(outcome pnp.Outcome, cb func()) {
+	m := tview.NewModal()
+	style := tcell.StyleDefault.Background(tcell.ColorBlack)
+	m.SetText(string(outcome)).SetBackgroundColor(tcell.ColorBlack).SetBorderColor(tcell.ColorWhite).SetBorderStyle(style)
+
+	m.AddButtons([]string{"ok"}).SetDoneFunc(func(buttonIndex int, buttonLabel string) {
+		if buttonLabel == "ok" {
+			e.Pages.RemovePage("modal")
+			cb()
+		}
+	})
+	e.Pages.AddPage("modal", m, true, true)
+
 }
 
 type Livable interface {
@@ -101,22 +116,10 @@ func alive(p pnp.Player) bool {
 	}
 	return true
 }
-func (e *Engine) RenderActivity(description string, fn func()) {
-	m := tview.NewModal()
-	style := tcell.StyleDefault.Background(tcell.ColorBlack)
-	m.SetText(description).SetBackgroundColor(tcell.ColorBlack).SetBorderColor(tcell.ColorWhite).SetBorderStyle(style)
 
-	m.AddButtons([]string{"ok"}).SetDoneFunc(func(buttonIndex int, buttonLabel string) {
-		if buttonLabel == "ok" {
-			e.Pages.RemovePage("modal")
-			fn()
-		}
-	})
-	e.Pages.AddPage("modal", m, true, true)
-}
-
-func (e *Engine) RenderPlayers(players []pnp.Player, current int) *tview.Flex {
+func (e *Engine) RenderPlayers(bandName string, players []pnp.Player, current int) *tview.Flex {
 	playersView := tview.NewFlex().SetDirection(tview.FlexRow)
+	playersView.SetTitle(bandName)
 	for i, p := range players {
 		var color tcell.Color
 		color = tcell.ColorWhite
@@ -194,7 +197,6 @@ func (e *Engine) GameOver() {
 	m.innerFlex.ResizeItem(m.modalFlex, 0, 3)
 
 	e.Pages.AddPage("game over", m, true, true)
-
 }
 
 func (e *Engine) PizzaDelivery(fn func()) {
