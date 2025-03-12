@@ -64,5 +64,5 @@ func (g *Game) Welcome(e Engine, fn func()) {
 
 // MainLoop kicks off the next players round
 func (g *Game) MainLoop(e Engine) {
-	
+
 }
