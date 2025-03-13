@@ -25,7 +25,10 @@ The test band of developers initially consists of a test character named after y
 
 Run the game by executing `go run cmd/pnp/main.go` to see what you have in action.
 
-### New requirement:
+### New requirement 0:
+- The game should end if all players are dead (fired or quit).
+
+### New requirement 1:
 - Every band has a minion - implemented in `pkg/pnp/minion.go`. Minions love PRODUCTION, the ultimate villain, and will do anything to serve it. 
 - A minion has only one skill - to cause bugs. A minion cannot learn new skills. A minion can be distracted using a banana.
 - Add a minion to every game in the game constructor.
