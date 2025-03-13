@@ -2,6 +2,7 @@ package pnp
 
 import (
 	_ "embed"
+	"fmt"
 )
 
 type (
@@ -59,6 +60,13 @@ func (player nopImortal) Alive() bool {
 		return mortal.Alive()
 	}
 	return true
+}
+
+func (player nopImortal) String() string {
+	if stringer, ok := player.BasePlayer.(interface{ String() string }); ok {
+		return stringer.String()
+	}
+	return fmt.Sprint(player.BasePlayer)
 }
 
 func (player nopImortal) isMinion() bool {
