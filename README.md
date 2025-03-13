@@ -20,14 +20,14 @@ Sir Tan Lee Knot has the following skills:
 
 The test band of developers initially consists of a test character named after your PM, Sir Tan Lee Knot. You can find it in `cmd/pnp/main.go`.
 
-- _- The band starts with 10 gold coins, which is used on every turn by the PM to pay the wages, it can be used to buy objects such as coffee or banana (you'll understand why in a sec), pizza, etc._
+- The band starts with 10 gold coins, which is used on every turn by the PM to pay the wages, it can be used to buy objects such as coffee or banana (you'll understand why in a sec), pizza, etc._
 - PRODUCTION is "calm".
 
 Run the game by executing `go run cmd/pnp/main.go` to see what you have in action.
 
 ### New requirement:
 - Every band has a minion - implemented in `pkg/pnp/minion.go`. Minions love PRODUCTION, the ultimate villain, and will do anything to serve it. 
-- A minion has only one skill is to cause bugs. A minion cannot learn new skills. A minion can be distracted using a banana.
+- A minion has only one skill - to cause bugs. A minion cannot learn new skills. A minion can be distracted using a banana.
 - Add a minion to every game in the game constructor.
 - Since a minion cannot die (it's a minion), we need to figure out a way to plug the minion into the game. The minion must not have an `Alive()  bool` method.
 - **Note: do not add the `Alive() bool` method to the minion.**
