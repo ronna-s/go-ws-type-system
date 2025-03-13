@@ -18,17 +18,11 @@ type (
 
 	Outcome string
 
-	Option interface {
-		// String returns a description of the option (e.g. "Drink coffee and ponder about life").
-		String() string
-		// Selected notifies the option that it was selected, and returns a description of the outcome (e.g. "You feel more awake, but PRODUCTION is unhappy").
-		Selected() Outcome
-	}
-
 	// Player represents a P&P player
 	Player interface {
 		Options(g *Game) []Option
 		AsciiArt() string
+		Alive() bool
 	}
 
 	// Engine represents the game's user interface rendering engine
@@ -50,10 +44,6 @@ func New(players ...Player) *Game {
 	return &g
 }
 
-type Livable interface {
-	Alive() bool
-}
-
 // Run starts a new game
 func (g *Game) Run(e Engine) {
 	g.Welcome(e, func() {
@@ -68,58 +58,35 @@ func (g *Game) Welcome(e Engine, fn func()) {
 	})
 }
 
-func alive(p Player) bool {
-	if livable, ok := p.(Livable); ok {
-		return livable.Alive()
-	}
-	return true
-}
-
-func AllPlayersAreDead(players []Player) bool {
-	for _, p := range players {
-		if alive(p) {
-			return false
-		}
-	}
-	return true
-}
-
-type IsMinion interface {
-	IsMinion() bool
-}
-
-func AllPlayersAreMinions(players []Player) bool {
-	for _, p := range players {
-		if minion, ok := p.(IsMinion); ok {
-			if !minion.IsMinion() {
-				return false
-			}
-		}
-	}
-	return true
-}
-
 // MainLoop kicks off the next players round
 func (g *Game) MainLoop(e Engine) {
-	if AllPlayersAreDead(g.Players) {
-		e.GameOver()
-		return
-	}
-	//if AllPlayersAreMinions(g.Players) {
-	//	e.GameOver()
-	//	return
-	//}
 	if g.Coins == 0 {
 		e.GameOver()
 		return
 	}
-	g.CurrentPlayer = (g.CurrentPlayer + 1) % len(g.Players)
+
 	e.RenderGame(g)
 	e.SelectOption(g, g.Players[g.CurrentPlayer], func(selected Option) {
 		outcome := selected.Selected()
 		e.RenderOutcome(outcome, func() {
+			g.CurrentPlayer++
+			if g.CurrentPlayer >= len(g.Players) {
+				g.CurrentPlayer = 0
+			}
 			g.MainLoop(e)
 		})
 	})
+}
 
+type Option struct {
+	OnSelect    func() Outcome
+	Description string
+}
+
+func (o Option) String() string {
+	return o.Description
+}
+
+func (o Option) Selected() Outcome {
+	return o.OnSelect()
 }

@@ -119,7 +119,9 @@ func alive(p pnp.Player) bool {
 
 func (e *Engine) RenderPlayers(bandName string, players []pnp.Player, current int) *tview.Flex {
 	playersView := tview.NewFlex().SetDirection(tview.FlexRow)
-	playersView.SetTitle(bandName)
+	playersView.SetTitle(bandName).
+		SetTitleColor(tcell.ColorWhite).
+		SetBorder(true).SetBorderPadding(0, 0, 1, 0).SetBorderColor(tcell.ColorDeepPink)
 	for i, p := range players {
 		var color tcell.Color
 		color = tcell.ColorWhite

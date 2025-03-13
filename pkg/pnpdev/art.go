@@ -7,6 +7,3 @@ var gopherArt string
 
 //go:embed resources/rubyist.txt
 var rubyistArt string
-
-//go:embed resources/minion.txt
-var minionArt string
