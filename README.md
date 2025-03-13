@@ -26,6 +26,7 @@ The test band of developers initially consists of a test character named after y
 Run the game by executing `go run cmd/pnp/main.go` to see what you have in action.
 
 ### New requirement 0:
+- The main loop should skip dead players.
 - The game should end if all players are dead (fired or quit).
 
 ### New requirement 1:

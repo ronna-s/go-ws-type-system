@@ -60,11 +60,6 @@ func (g *Game) Welcome(e Engine, fn func()) {
 
 // MainLoop kicks off the next players round
 func (g *Game) MainLoop(e Engine) {
-	if g.Coins == 0 {
-		e.GameOver()
-		return
-	}
-
 	e.RenderGame(g)
 	e.SelectOption(g, g.Players[g.CurrentPlayer], func(selected Option) {
 		outcome := selected.Selected()
