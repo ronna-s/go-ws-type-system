@@ -18,11 +18,19 @@ type (
 
 	Outcome string
 
-	// Player represents a P&P player
-	Player interface {
+	BasePlayer interface {
 		Options(g *Game) []Option
 		AsciiArt() string
+	}
+
+	CanDie interface {
 		Alive() bool
+	}
+
+	// Player represents a P&P player
+	Player interface {
+		BasePlayer
+		CanDie
 	}
 
 	// Engine represents the game's user interface rendering engine
@@ -38,9 +46,33 @@ type (
 	}
 )
 
+func NopImortal(player BasePlayer) Player {
+	return nopImortal{BasePlayer: player}
+}
+
+type nopImortal struct {
+	BasePlayer
+}
+
+func (player nopImortal) Alive() bool {
+	if mortal, ok := player.BasePlayer.(CanDie); ok {
+		return mortal.Alive()
+	}
+	return true
+}
+
+func (player nopImortal) isMinion() bool {
+	if mortal, ok := player.BasePlayer.(IsMinion); ok {
+		return mortal.isMinion()
+	}
+	return true
+}
+
 // New returns a new P&P game
 func New(players ...Player) *Game {
-	g := Game{Players: players, Prod: NewProduction(), Coins: 10}
+	// plugin the minion
+
+	g := Game{Players: append(players, NopImortal(NewMinion("Bob"))), Prod: NewProduction(), Coins: 10}
 	return &g
 }
 
@@ -58,16 +90,54 @@ func (g *Game) Welcome(e Engine, fn func()) {
 	})
 }
 
+func allPlayersAreMinions(players []Player) bool {
+	for _, p := range players {
+		if !p.Alive() {
+			continue
+		}
+		if m, ok := p.(IsMinion); ok {
+			if !m.isMinion() {
+				return false
+			}
+		} else {
+			return false
+		}
+	}
+	return true
+}
+
+func allPlayersAreDead(players []Player) bool {
+	for _, p := range players {
+		if p.Alive() {
+			return false
+		}
+	}
+	return true
+}
+
 // MainLoop kicks off the next players round
 func (g *Game) MainLoop(e Engine) {
+	if allPlayersAreMinions(g.Players) {
+		e.GameOver()
+		return
+	}
+
+	if allPlayersAreDead(g.Players) {
+		e.GameOver()
+		return
+	}
+
+	for !g.Players[g.CurrentPlayer].Alive() {
+		g.CurrentPlayer = (g.CurrentPlayer + 1) % len(g.Players)
+	}
+	// check if all players are dead and end the game (if they are).
+	// check if the current player is dead and skip it.
+
 	e.RenderGame(g)
 	e.SelectOption(g, g.Players[g.CurrentPlayer], func(selected Option) {
 		outcome := selected.Selected()
 		e.RenderOutcome(outcome, func() {
-			g.CurrentPlayer++
-			if g.CurrentPlayer >= len(g.Players) {
-				g.CurrentPlayer = 0
-			}
+			g.CurrentPlayer = (g.CurrentPlayer + 1) % len(g.Players)
 			g.MainLoop(e)
 		})
 	})

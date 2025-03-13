@@ -38,6 +38,14 @@ func (m Minion) Options(g *Game) []Option {
 	return options
 }
 
+type IsMinion interface {
+	isMinion() bool
+}
+
+func (m Minion) isMinion() bool {
+	return true
+}
+
 func (m Minion) String() string {
 	return "Minion"
 }
